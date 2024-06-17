@@ -3,22 +3,21 @@ package storage
 import (
 	"context"
 	"errors"
-	"fmt"
 )
 
-type StorageType string
+type Backends string
 
-func (s StorageType) String() string {
+func (s Backends) String() string {
 	return string(s)
 }
 
 const (
-	S3Backends    StorageType = "s3"
-	LocalBackends             = "file"
-	//GCSBackends   = "gcs" // To be implemented
+	LocalBackends Backends = "file"
+	S3Backends    Backends = "s3"
+	//GCSBackends   Backends = "gcs" // To be implemented
 )
 
-var supportedStorageTypes = map[StorageType]bool{
+var supportedBackendss = map[Backends]bool{
 	LocalBackends: true,
 	S3Backends:    true,
 	//GCSBackends:   true,
@@ -58,14 +57,6 @@ func NewStorage(options ...Option) (Storage, error) {
 	var s Storage
 	switch opts.backends {
 	case S3Backends:
-		if opts.s3opts == nil {
-			return nil, fmt.Errorf("no S3 config provided")
-		}
-
-		if err := opts.s3opts.Validate(); err != nil {
-			return nil, err
-		}
-
 		s, err = NewS3Storage(opts.s3opts)
 		if err != nil {
 			return nil, err

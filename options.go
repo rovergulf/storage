@@ -2,27 +2,37 @@ package storage
 
 import (
 	"fmt"
-	"go.opentelemetry.io/otel/trace"
 	"path/filepath"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Options struct {
-	backends   StorageType
+	backends   Backends
 	pathPrefix string
 	tracer     trace.Tracer
 	s3opts     *S3Options
 }
 
 func (o *Options) validateAndFix() error {
-	if ok := supportedStorageTypes[o.backends]; !ok {
-		return fmt.Errorf("backends not supported or not specified: '%s'", o.backends)
-	}
+	switch o.backends {
+	case S3Backends:
 
-	if o.backends == LocalBackends {
+		if o.s3opts == nil {
+			return fmt.Errorf("no S3 config provided")
+		}
+
+		if err := o.s3opts.Validate(); err != nil {
+			return err
+		}
+
+	case LocalBackends:
 		// to prevent uncontrolled file writes on local machines
 		if len(filepath.SplitList(o.pathPrefix)) < 2 {
 			return fmt.Errorf("path prefix must contain at least two segments")
 		}
+	default:
+		return ErrUnsupportedBackends
 	}
 
 	return nil
@@ -30,7 +40,7 @@ func (o *Options) validateAndFix() error {
 
 type Option func(o *Options)
 
-func WithBackends(backends StorageType) Option {
+func WithBackends(backends Backends) Option {
 	return func(o *Options) {
 		o.backends = backends
 	}
