@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -24,6 +25,8 @@ type S3Storage struct {
 	bucket string
 	prefix string
 	s3     *s3.Client
+
+	tracer trace.Tracer
 }
 
 type S3Options struct {
@@ -63,6 +66,10 @@ func NewS3Storage(opts *S3Options) (*S3Storage, error) {
 		bucket: opts.Bucket,
 		prefix: opts.PathPrefix,
 	}, nil
+}
+
+func (s *S3Storage) WithTracer(tracer trace.Tracer) TracingStorage {
+	return NewTracingStorage(s, tracer)
 }
 
 func (s *S3Storage) Purge(ctx context.Context) error {

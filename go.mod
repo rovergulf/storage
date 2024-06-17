@@ -8,6 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.55.1
 	github.com/aws/smithy-go v1.20.2
 	github.com/stretchr/testify v1.9.0
+	go.opentelemetry.io/otel v1.27.0
+	go.opentelemetry.io/otel/trace v1.27.0
 )
 
 require (

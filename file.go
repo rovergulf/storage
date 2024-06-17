@@ -5,14 +5,26 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+
+	"go.opentelemetry.io/otel/trace"
+)
+
+var (
+	defaultDirStoragePath = filepath.Join(os.TempDir(), "go-storage")
 )
 
 type FileStorage struct {
 	dir string
+
+	tracer trace.Tracer
 }
 
 func NewFileStorage(dir string) *FileStorage {
 	return &FileStorage{dir: dir}
+}
+
+func (s *FileStorage) WithTracer(tracer trace.Tracer) TracingStorage {
+	return NewTracingStorage(s, tracer)
 }
 
 func (s *FileStorage) Purge(ctx context.Context) error {
