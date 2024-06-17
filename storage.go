@@ -24,7 +24,6 @@ var supportedBackendss = map[Backends]bool{
 }
 
 var ErrNotExists = errors.New("file not exists")
-var ErrUnsupportedBackends = errors.New("unsupported backends")
 
 // Storage represents main interface for file storage as key/value database
 type Storage interface {

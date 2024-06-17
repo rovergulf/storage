@@ -1,10 +1,16 @@
 package storage
 
 import (
-	"fmt"
+	"errors"
 	"path/filepath"
 
 	"go.opentelemetry.io/otel/trace"
+)
+
+var (
+	ErrNoS3ConfigProvided      = errors.New("no S3 config provided")
+	ErrUnsupportedBackends     = errors.New("unsupported backends")
+	ErrFileStorageUnsafePrefix = errors.New("path prefix must contain at least two segments")
 )
 
 type Options struct {
@@ -17,19 +23,17 @@ type Options struct {
 func (o *Options) validateAndFix() error {
 	switch o.backends {
 	case S3Backends:
-
 		if o.s3opts == nil {
-			return fmt.Errorf("no S3 config provided")
+			return ErrNoS3ConfigProvided
 		}
 
 		if err := o.s3opts.Validate(); err != nil {
 			return err
 		}
-
 	case LocalBackends:
 		// to prevent uncontrolled file writes on local machines
 		if len(filepath.SplitList(o.pathPrefix)) < 2 {
-			return fmt.Errorf("path prefix must contain at least two segments")
+			return ErrFileStorageUnsafePrefix
 		}
 	default:
 		return ErrUnsupportedBackends
