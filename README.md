@@ -10,6 +10,15 @@ go get github.com/rovergulf/storage
 
 ### Example
 ```go
+package main
+
+import (
+	"context"
+	"log"
+	
+	"github.com/rovergulf/storage"
+)
+
 func main() {
     ctx := context.Background()
 
@@ -17,10 +26,10 @@ func main() {
 
     fs, err := storage.NewStorage(
         storage.WithBackends(storage.LocalBackends),
-        storage.WithPathPrefix(storagePath),
+        storage.WithPrefix(storagePath),
     )
     if err != nil {
-        // log.Fatal(err)	
+        log.Fatal(err)	
     }
 
     fileData := []byte(`{"example": "hello world"}`)
@@ -28,15 +37,44 @@ func main() {
 	
     // check if file key already exists 
     if exists, _ := fs.Exists(ctx, fileName); exists {
-        // log.Info("already exists")
+        log.Printf("'%s' already exists", fileName)
         return
     }
 	
 	// upload data
     uploadErr := fs.Put(ctx, fileName, fileData)
     if uploadErr != nil {
-        // log.Errorf("Unable to upload to '%s': %s", fileName, err)
+        log.Fatalf("Unable to upload to '%s': %s", fileName, err)
         // handle uploadErr
     }
 }
+```
+
+### OpenTelemetry support
+This package supports OpenTelemetry tracer spans, and can be configured via `storage.WithTracer` option
+Visit [opentelemetry-go examples](https://github.com/open-telemetry/opentelemetry-go/tree/main/example) to install tracer provider and provide tracer as storage option
+```go
+package main
+
+import (
+	...
+	
+	"go.opentelemetry.io/otel"
+	
+	"github.com/rovergulf/storage"
+)
+
+func main() {
+	tracer := otel.Tracer("go-storage")
+	
+	fs, err := storage.NewStorage(
+		...,
+		storage.WithTracer(tracer),
+	)
+	if err != nil {
+		// handle err	
+	}
+
+}
+
 ```
