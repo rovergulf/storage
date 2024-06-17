@@ -14,7 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
-	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -25,8 +24,6 @@ type S3Storage struct {
 	bucket string
 	prefix string
 	s3     *s3.Client
-
-	tracer trace.Tracer
 }
 
 type S3Options struct {
@@ -68,10 +65,6 @@ func NewS3Storage(opts *S3Options) (*S3Storage, error) {
 	}, nil
 }
 
-func (s *S3Storage) WithTracer(tracer trace.Tracer) TracingStorage {
-	return NewTracingStorage(s, tracer)
-}
-
 func (s *S3Storage) Purge(ctx context.Context) error {
 	if _, err := s.s3.DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: aws.String(s.bucket),
@@ -100,6 +93,25 @@ func (s *S3Storage) Get(ctx context.Context, key string) ([]byte, error) {
 	}
 
 	return value, nil
+}
+
+func (s *S3Storage) GetMultiple(ctx context.Context, keys []string) ([]Object, error) {
+	objects := make([]Object, 0, len(keys))
+
+	for _, key := range keys {
+		obj, err := s.Get(ctx, key)
+		if err != nil {
+			return nil, err
+		}
+
+		objects = append(objects, Object{
+			Key:  key,
+			Size: int64(len(obj)),
+			Data: obj,
+		})
+	}
+
+	return objects, nil
 }
 
 func (s *S3Storage) Exists(ctx context.Context, key string) (bool, error) {

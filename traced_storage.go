@@ -9,6 +9,8 @@ import (
 
 type TracingStorage interface {
 	Storage
+
+	GetMultiple(ctx context.Context, keys []string) ([]Object, error)
 }
 
 type tracedStorage struct {
@@ -38,9 +40,9 @@ func (s *tracedStorage) Get(ctx context.Context, key string) ([]byte, error) {
 	return s.storage.Get(ctx, key)
 }
 
-//func (s *tracedStorage) GetMultiple(ctx context.Context, filePaths []string) ([]Object, error) {
-//	return s.storage.GetMultiple(ctx, filePaths)
-//}
+func (s *tracedStorage) GetMultiple(ctx context.Context, keys []string) ([]Object, error) {
+	return s.storage.GetMultiple(ctx, keys)
+}
 
 func (s *tracedStorage) Exists(ctx context.Context, key string) (bool, error) {
 	if s.tracer != nil {
