@@ -101,5 +101,11 @@ func (s *tracedStorage) Put(ctx context.Context, key string, data []byte) error 
 }
 
 func (s *tracedStorage) Purge(ctx context.Context) error {
+	if s.tracer != nil {
+		var span trace.Span
+		ctx, span = s.tracer.Start(ctx, "purge")
+		defer span.End()
+	}
+
 	return s.storage.Purge(ctx)
 }
