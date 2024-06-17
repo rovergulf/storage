@@ -15,14 +15,28 @@ func main() {
 
     storagePath := "/temp/my-storage"
 
-    fileStorage := NewFileStorage(storagePath)
+    fs, err := storage.NewStorage(
+        storage.WithBackends(storage.LocalBackends),
+        storage.WithPathPrefix(storagePath),
+    )
+    if err != nil {
+        // log.Fatal(err)	
+    }
 
     fileData := []byte(`{"example": "hello world"}`)
-    fileName := example.json
-
-    err := fileStorage.Put(ctx, fileName, fileData)
-	if err != nil {
-		// handle err
+    fileName := "example.json"
+	
+    // check if file key already exists 
+    if exists, _ := fs.Exists(ctx, fileName); exists {
+        // log.Info("already exists")
+        return
+    }
+	
+	// upload data
+    uploadErr := fs.Put(ctx, fileName, fileData)
+    if uploadErr != nil {
+        // log.Errorf("Unable to upload to '%s': %s", fileName, err)
+        // handle uploadErr
     }
 }
 ```

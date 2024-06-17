@@ -95,6 +95,25 @@ func (s *S3Storage) Get(ctx context.Context, key string) ([]byte, error) {
 	return value, nil
 }
 
+func (s *S3Storage) GetMultiple(ctx context.Context, keys []string) ([]Object, error) {
+	objects := make([]Object, 0, len(keys))
+
+	for _, key := range keys {
+		obj, err := s.Get(ctx, key)
+		if err != nil {
+			return nil, err
+		}
+
+		objects = append(objects, Object{
+			Key:  key,
+			Size: int64(len(obj)),
+			Data: obj,
+		})
+	}
+
+	return objects, nil
+}
+
 func (s *S3Storage) Exists(ctx context.Context, key string) (bool, error) {
 	filePath := path.Join(s.prefix, key)
 	_, err := s.s3.HeadObject(ctx, &s3.HeadObjectInput{
