@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	ErrNoS3ConfigProvided      = errors.New("no S3 config provided")
-	ErrUnsupportedBackends     = errors.New("unsupported backends")
-	ErrFileStorageUnsafePrefix = errors.New("path prefix must contain at least two segments")
+	ErrNoS3ConfigProvided       = errors.New("no S3 config provided")
+	ErrUnsupportedBackends      = errors.New("unsupported backends")
+	ErrLocalStorageUnsafePrefix = errors.New("path prefix must contain at least two segments")
 )
 
 type Options struct {
@@ -33,7 +33,7 @@ func (o *Options) validateAndFix() error {
 	case LocalBackends:
 		// to prevent uncontrolled file writes on local machines
 		if len(filepath.SplitList(o.pathPrefix)) < 2 {
-			return ErrFileStorageUnsafePrefix
+			return ErrLocalStorageUnsafePrefix
 		}
 	default:
 		return ErrUnsupportedBackends
