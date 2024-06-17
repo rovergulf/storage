@@ -28,5 +28,4 @@ func (s *storageSuite) TestFailBackends() {
 	_, fail3 := NewStorage(WithBackends("something"))
 	s.Error(fail3, "should return unsupported blockchain error")
 	s.Equal(ErrUnsupportedBackends, fail3, "should return unsupported blockchain error")
-
 }
