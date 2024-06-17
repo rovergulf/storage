@@ -51,7 +51,7 @@ func main() {
 ```
 
 ### OpenTelemetry support
-This package supports OpenTelemetry tracer spans, and can be configured via `storage.WithTracer` option
+This package supports OpenTelemetry tracer spans, and can be configured via `storage.WithTracer` option  
 Visit [opentelemetry-go examples](https://github.com/open-telemetry/opentelemetry-go/tree/main/example) to install tracer provider and provide tracer as storage option
 ```go
 package main
