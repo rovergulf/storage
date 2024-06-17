@@ -25,7 +25,11 @@ func (s *storageSuite) TestFailBackends() {
 	s.Error(fail2, "should return unsupported blockchain error")
 	s.Equal(ErrUnsupportedBackends, fail2, "should return unsupported blockchain error")
 
-	_, fail3 := NewStorage(WithBackends("something"))
-	s.Error(fail3, "should return unsupported blockchain error")
-	s.Equal(ErrUnsupportedBackends, fail3, "should return unsupported blockchain error")
+	_, fail3 := NewStorage(WithBackends(S3Backends))
+	s.Error(fail3, "should return no s3 config error")
+	s.Equal(ErrNoS3ConfigProvided, fail3, "should return no s3 config error")
+
+	_, fail4 := NewStorage(WithBackends(LocalBackends))
+	s.Error(fail4, "should return unsafe local storage path errorr")
+	s.Equal(ErrLocalStorageUnsafePrefix, fail4, "should return unsafe local storage path error")
 }
