@@ -1,3 +1,6 @@
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/rovergulf/storage)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/rovergulf/storage/test?branch=main)
+
 # storage
 
 This repository contains source code for file storage, 
