@@ -2,7 +2,7 @@ package storage
 
 import (
 	"errors"
-	"path/filepath"
+	"strings"
 
 	"go.opentelemetry.io/otel/trace"
 )
@@ -32,7 +32,7 @@ func (o *Options) validateAndFix() error {
 		}
 	case LocalBackends:
 		// to prevent uncontrolled file writes on local machines
-		if len(filepath.SplitList(o.pathPrefix)) < 2 {
+		if len(strings.Split(o.pathPrefix, "/")) < 2 {
 			return ErrLocalStorageUnsafePrefix
 		}
 	default:
